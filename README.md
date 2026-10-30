@@ -117,7 +117,7 @@ api-node/
 docker-compose.yml
 ```
 
-## Pendiente / mejoras posibles
+##  Despliegue en la nube 
 
 - Autenticación con JWT (opcional en el enunciado)
 - Frontend para cargar matrices y ver resultados (opcional)
