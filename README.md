@@ -10,6 +10,26 @@ Cliente ──POST /qr──▶ API Go :8080 ──POST /stats──▶ API Node
         ◀──── { q, r, estadisticas } ◀───────────────────┘
 ```
 
+## Demo en la nube
+
+Desplegado en Render (plan gratuito, con Docker):
+
+- **API Go:** https://coding-challenge-qr.onrender.com
+- **API Node:** https://api-node-06bf.onrender.com
+
+Prueba rápida:
+
+```bash
+curl -X POST https://coding-challenge-qr.onrender.com/qr \
+  -H "Content-Type: application/json" \
+  -d '{"matriz":[[12,-51,4],[6,167,-68],[-4,24,-41]]}'
+```
+
+> En el plan gratuito, los servicios se duermen tras 15 minutos sin uso,
+> así que la primera llamada puede tardar hasta un minuto.
+
+No se necesitan credenciales: los endpoints son públicos.
+
 ## Cómo correrlo
 
 ### Con Docker (recomendado)
@@ -98,7 +118,7 @@ Los tests de Go no necesitan la API Node: usan un servidor falso (`httptest`) qu
 - **Tolerancia de 1e-10:** los cálculos con decimales dejan restos como `1e-16` donde debería haber un 0. Por eso "es diagonal" y "columna nula" se comparan con una tolerancia y no con `== 0`.
 - **Lógica separada del servidor:** `qr/qr.go` y `src/estadisticas.js` no saben nada de HTTP. Así se pueden probar solas y el código queda más ordenado.
 - **Estadísticas en un solo recorrido:** O(n), sin arrays intermedios. Se evita `Math.max(...array)`, que puede fallar con arrays muy grandes.
-- **Comunicación Go → Node:** la URL de Node se configura con la variable `NODE_API_URL`. Así en local es `localhost:3005` y en Docker es `api-node:3005`, sin cambiar código. El cliente HTTP tiene un timeout de 5 s, y si Node falla se responde **502 Bad Gateway**, porque el error es de otro servicio y no del cliente.
+- **Comunicación Go → Node:** la URL de Node se configura con la variable `NODE_API_URL`. Así en local es `localhost:3005` y en Docker es `api-node:3005`, sin cambiar código. El cliente HTTP tiene un timeout de 60 s (generoso por el arranque en frío del plan gratuito de Render), y si Node falla se responde **502 Bad Gateway**, porque el error es de otro servicio y no del cliente.
 - **Docker:** la imagen de Go es multi-etapa (la final pesa unos 33 MB). Ambas imágenes corren con un usuario sin privilegios, y Node instala solo las dependencias de producción.
 
 ## Estructura
@@ -117,9 +137,9 @@ api-node/
 docker-compose.yml
 ```
 
-##  Despliegue en la nube 
+## Pendiente / mejoras posibles
 
 - Autenticación con JWT (opcional en el enunciado)
 - Frontend para cargar matrices y ver resultados (opcional)
-- Despliegue en la nube
+- Comunicación Go → Node por red privada (no disponible en el plan gratuito de Render)
 - Factorización con Householder para matrices mal condicionadas
