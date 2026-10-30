@@ -1,0 +1,21 @@
+services:
+  api-node:
+    build: ./api-node
+    ports:
+      - "3005:3005"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3005/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api-go:
+    build: ./api-go
+    ports:
+      - "8080:8080"
+    environment:
+      # Dentro de la red de Docker, cada servicio se llama por su nombre
+      NODE_API_URL: http://api-node:3005
+    depends_on:
+      api-node:
+        condition: service_healthy
