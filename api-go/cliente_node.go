@@ -17,11 +17,11 @@ type Estadisticas struct {
 	AlgunaDiagonal bool    `json:"algunaDiagonal"`
 }
 
-// Cliente HTTP con timeout, para no quedarnos esperando
-// para siempre si la API Node no responde.
-var clienteHTTP = &http.Client{Timeout: 5 * time.Second}
+// Cliente HTTP con timeout, para no quedarnos esperando para siempre
+// si la API Node no responde. Es generoso porque en el plan gratuito
+// de Render el servicio "despierta" en hasta ~1 minuto.
+var clienteHTTP = &http.Client{Timeout: 60 * time.Second}
 
-// pedirEstadisticas envía Q y R a la API Node y devuelve sus estadísticas.
 func pedirEstadisticas(urlNode string, q, r [][]float64) (Estadisticas, error) {
 	var estadisticas Estadisticas
 
